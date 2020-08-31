@@ -1,6 +1,8 @@
 package de.neocraftr.scammerlist.listener;
 
 import de.neocraftr.scammerlist.ScammerList;
+import de.neocraftr.scammerlist.utils.Database;
+import de.neocraftr.scammerlist.utils.ListType;
 import net.labymod.api.events.MessageReceiveEvent;
 
 import java.util.ArrayList;
@@ -32,9 +34,7 @@ public class ChatReceiveListener implements MessageReceiveEvent {
                             if(addClan) {
                                 String uuid = sc.getHelper().getUUIDFromName(name);
                                 if (uuid != null) {
-                                    if (!sc.getPrivateListUUID().contains(uuid)) {
-                                        sc.getPrivateListUUID().add(uuid);
-                                        sc.getPrivateListName().add(name);
+                                    if (!sc.getHelper().addPlayer(uuid, name, ListType.PRIVATE)) {
                                         addNewPlayer();
                                     }
                                 } else {
@@ -44,9 +44,7 @@ public class ChatReceiveListener implements MessageReceiveEvent {
                             if(removeClan) {
                                 String uuid = sc.getHelper().getUUIDFromName(name);
                                 if (uuid != null) {
-                                    if (sc.getPrivateListUUID().contains(uuid)) {
-                                        sc.getPrivateListUUID().remove(uuid);
-                                        sc.getPrivateListName().remove(name);
+                                    if (sc.getHelper().removePlayer(uuid, ListType.PRIVATE)) {
                                         addNewPlayer();
                                     }
                                 } else {

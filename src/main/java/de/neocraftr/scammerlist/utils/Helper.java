@@ -10,13 +10,19 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class Helper {
 
     private ScammerList sc = ScammerList.getScammerList();
+    private Database db = ScammerList.getScammerList().getDatabase();
 
     public ArrayList<String> getNamesFromUUID(String uuid) {
         ArrayList<String> names = new ArrayList<>();
@@ -75,21 +81,21 @@ public class Helper {
         return null;
     }
 
-    public void downloadOnlineScammerList() {
+    private void downloadOnlineScammerList() {
         try {
             try(BufferedReader reader = Resources.asCharSource(new URL(ScammerList.ONLINE_SCAMMER_URL), StandardCharsets.UTF_8).openBufferedStream()) {
 
                 JsonReader json = new JsonReader(reader);
                 json.beginArray();
 
-                sc.getOnlineListUUID().clear();
+                clearList(ListType.ONLINE);
 
                 while (json.hasNext()) {
                     json.beginObject();
                     while (json.hasNext()) {
                         if(json.nextName().equals("uuid")) {
                             String uuid = json.nextString();
-                            sc.getOnlineListUUID().add(uuid);
+                            addPlayer(uuid, "", ListType.ONLINE);
                         } else {
                             json.nextString();
                         }
@@ -110,9 +116,10 @@ public class Helper {
         sc.setUpdatingList(true);
         sc.getNameChangedPlayers().clear();
 
-        // Update online list
         downloadOnlineScammerList();
-        ArrayList<String> newOnlineScammerListName = new ArrayList<>();
+
+        HashMap<String, String> scammerList = getList(ListType.ONLINE);
+        scammerList.putAll(getList(ListType.PRIVATE));
         sc.getOnlineListUUID().forEach(uuid -> {
             ArrayList<String> names = getNamesFromUUID(uuid);
             if(!sc.getOnlineListName().contains(names.get(0))) {
@@ -120,18 +127,6 @@ public class Helper {
             }
             newOnlineScammerListName.add(names.get(0));
         });
-        sc.setOnlineListName(newOnlineScammerListName);
-
-        // Update private list
-        ArrayList<String> newScammerListName = new ArrayList<>();
-        sc.getPrivateListUUID().forEach(uuid -> {
-            ArrayList<String> names = getNamesFromUUID(uuid);
-            if(!sc.getPrivateListName().contains(names.get(0))) {
-                addNameChange(names);
-            }
-            newScammerListName.add(names.get(0));
-        });
-        sc.setPrivateListName(newScammerListName);
 
         sc.saveConfig();
         sc.setUpdatingList(false);
@@ -152,4 +147,102 @@ public class Helper {
     public String colorize(String msg) {
         return msg.replace("&", "§");
     }
+
+    public boolean checkUUID(String uuid, ListType type) {
+        try {
+            PreparedStatement ps = db.getConnection().prepareStatement("SELECT EXISTS(SELECT uuid FROM scammer WHERE uuid = ? AND type = ?);");
+            ps.setString(0, uuid);
+            ps.setString(1, type.toString());
+            ResultSet rs = ps.executeQuery();
+            ps.close();
+            rs.next();
+            return rs.getInt(0) == 1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean checkName(String name, ListType type) {
+        try {
+            PreparedStatement ps = db.getConnection().prepareStatement("SELECT EXISTS(SELECT uuid FROM scammer WHERE name = ? AND type = ?);");
+            ps.setString(0, name);
+            ps.setString(1, type.toString());
+            ResultSet rs = ps.executeQuery();
+            ps.close();
+            rs.next();
+            return rs.getInt(0) == 1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean addPlayer(String uuid, String name, ListType type) {
+        if(checkUUID(uuid, type)) return false;
+        try {
+            PreparedStatement ps = db.getConnection().prepareStatement("INSERT INTO scammer(uuid, name, type) VALUES (?, ?, ?);");
+            ps.setString(0, uuid);
+            ps.setString(1, name);
+            ps.setString(2, type.toString());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean removePlayer(String uuid, ListType type) {
+        if(!checkUUID(uuid, type)) return false;
+        try {
+            PreparedStatement ps = db.getConnection().prepareStatement("DELETE FROM scammer WHERE uuid = ? AND type = ?;");
+            ps.setString(0, uuid);
+            ps.setString(1, type.toString());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateName(String uuid, String newName, ListType type) {
+        if(!checkUUID(uuid, type)) return false;
+        try {
+            PreparedStatement ps = db.getConnection().prepareStatement("UPDATE scammer SET name = ? WHERE uuid = ? AND type = ?;");
+            ps.setString(0, newName);
+            ps.setString(1, uuid);
+            ps.setString(2, type.toString());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void clearList(ListType type) {
+        try {
+            PreparedStatement ps = db.getConnection().prepareStatement("DELETE FROM scammer WHERE type = ?;");
+            ps.setString(0, type.toString());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public HashMap<String, String> getList(ListType type) {
+        HashMap<String, String> scammerList = new HashMap<>();
+        try {
+            PreparedStatement ps = db.getConnection().prepareStatement("SELECT uuid, name FROM scammer WHERE type = ?;");
+            ps.setString(0, type.toString());
+            ResultSet rs = ps.executeQuery();
+            ps.close();
+            while(rs.next()) {
+                scammerList.put(rs.getString(0), rs.getString(1));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return scammerList;
+    }
+
 }

@@ -2,8 +2,8 @@
   "uuid": "%uuid%",
   "name": "Scammerliste",
   "mainClass": "de.neocraftr.scammerlist.ScammerList",
-  "description": "Scammerlist for GrieferGames.net or other servers.",
-  "version": 1,
+  "description": "Scammerlist for GrieferGames.net or similar servers.",
+  "version": 2.0,
   "author": "Neocraftr",
   "category": 2
 }

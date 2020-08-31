@@ -2,15 +2,14 @@ package de.neocraftr.scammerlist;
 
 import com.google.gson.Gson;
 import de.neocraftr.scammerlist.listener.*;
+import de.neocraftr.scammerlist.utils.Database;
 import de.neocraftr.scammerlist.utils.Helper;
 import de.neocraftr.scammerlist.utils.SettingsManager;
+import net.labymod.addon.AddonLoader;
 import net.labymod.api.LabyModAddon;
 import net.labymod.settings.elements.SettingsElement;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ScammerList extends LabyModAddon {
 
@@ -24,6 +23,7 @@ public class ScammerList extends LabyModAddon {
     private Gson gson;
     private SettingsManager settings;
     private Helper helper;
+    private Database database;
     private long nextUpdate = 0;
     private ArrayList<String> privateListName = new ArrayList<>();
     private ArrayList<String> privateListUUID = new ArrayList<>();
@@ -39,12 +39,19 @@ public class ScammerList extends LabyModAddon {
         setGson(new Gson());
         setSettings(new SettingsManager());
         setHelper(new Helper());
+        setDatabase(new Database(AddonLoader.getConfigDirectory()+"/ScammerList.db"));
+        getDatabase().connect();
 
         getApi().getEventManager().register(new ChatSendListener());
         getApi().getEventManager().register(new ChatReceiveListener());
         getApi().getEventManager().register(new ModifyChatListener());
         getApi().registerForgeListener(new PreRenderListener());
         registerEvent(new CommandListener());
+    }
+
+    @Override
+    public void onDisable() {
+        getDatabase().close();
     }
 
     @Override
@@ -139,7 +146,14 @@ public class ScammerList extends LabyModAddon {
         return helper;
     }
 
-    public ArrayList<String> getPrivateListName() {
+    public void setDatabase(Database database) {
+        this.database = database;
+    }
+    public Database getDatabase() {
+        return database;
+    }
+
+    /*public ArrayList<String> getPrivateListName() {
         return privateListName;
     }
     public void setPrivateListName(ArrayList<String> privateListName) {
@@ -165,7 +179,7 @@ public class ScammerList extends LabyModAddon {
     }
     public void setOnlineListUUID(ArrayList<String> onlineListUUID) {
         this.onlineListUUID = onlineListUUID;
-    }
+    }*/
 
     public ArrayList<String> getNameChangedPlayers() {
         return nameChangedPlayers;
