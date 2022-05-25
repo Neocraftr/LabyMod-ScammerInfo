@@ -80,16 +80,18 @@ public class Scammer {
         public Scammer deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             final JsonObject object = json.getAsJsonObject();
 
-            final JsonElement dateValue = object.get("date");
             long date = 0;
-            // Convert ISO Timestamp to Unix time
-            if(dateValue.getAsJsonPrimitive().isNumber()) {
-                date = dateValue.getAsLong();
-            } else if(dateValue.getAsJsonPrimitive().isString()) {
-                try {
-                    String isoTimestamp = dateValue.getAsString();
-                    date = ZonedDateTime.parse(isoTimestamp).toEpochSecond()*1000;
-                } catch(DateTimeParseException e) {}
+            if(object.has("date")) {
+                final JsonElement dateValue = object.get("date");
+                // Convert ISO Timestamp to Unix time
+                if(dateValue.getAsJsonPrimitive().isNumber()) {
+                    date = dateValue.getAsLong();
+                } else if(dateValue.getAsJsonPrimitive().isString()) {
+                    try {
+                        String isoTimestamp = dateValue.getAsString();
+                        date = ZonedDateTime.parse(isoTimestamp).toEpochSecond()*1000;
+                    } catch(DateTimeParseException e) {}
+                }
             }
 
             String description = null;
