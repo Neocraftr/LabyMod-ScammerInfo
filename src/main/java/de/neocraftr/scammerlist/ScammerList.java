@@ -19,7 +19,7 @@ public class ScammerList extends LabyModAddon {
                                PREFIX_LINE = "§f-------------------- §4ScammerInfo §f--------------------",
                                CONSOLE_PREFIX = "[ScammerInfo] ",
                                COMMAND_PREFIX = ".",
-                               VERSION = "1.9.2";
+                               VERSION = "1.9.3";
     public static final int PLAYERS_PER_LIST_PAGE = 15;
 
     private static ScammerList scammerList;
