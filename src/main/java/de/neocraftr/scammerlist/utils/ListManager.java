@@ -38,11 +38,15 @@ public class ListManager {
                 JsonObject list = element.getAsJsonObject();
                 PlayerList playerList = new PlayerList(sc.getGson().fromJson(list, PlayerList.Meta.class));
 
+
                 // Remove old list from previous versions
                 if(playerList.getMeta().getName().equalsIgnoreCase("[SCAMMER] Radar") || playerList.getMeta().getUrl().equalsIgnoreCase("%scammer-radar%")) continue;
 
                 if(playerList.getMeta().getId().equals("scammer-radar-sc")) hasScammerRadarSC = true;
                 if(playerList.getMeta().getId().equals("scammer-radar-mm")) hasScammerRadarMM = true;
+
+                // Temporarily disable Scammer Radar MMs
+                if(playerList.getMeta().getId().equals("scammer-radar-mm")) continue;
 
                 playerList.load();
                 lists.add(playerList);
