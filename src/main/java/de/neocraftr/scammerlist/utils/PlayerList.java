@@ -1,6 +1,5 @@
 package de.neocraftr.scammerlist.utils;
 
-import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import de.neocraftr.scammerlist.ScammerList;
 import org.apache.commons.io.FileUtils;
@@ -36,38 +35,38 @@ public class PlayerList extends ArrayList<Scammer> {
 
     public boolean containsUUID(String uuid) {
         for(Scammer scammer : this) {
-            if(scammer.getUUID().equals(uuid)) return true;
+            if(scammer.getUUID() != null && scammer.getUUID().equals(uuid)) return true;
         }
         return false;
     }
 
     public boolean containsName(String name) {
         for(Scammer scammer : this) {
-            if(scammer.getName().equals(name)) return true;
+            if(scammer.getName() != null && scammer.getName().equals(name)) return true;
         }
         return false;
     }
 
     public Scammer getByUUID(String uuid) {
         for(Scammer scammer : this) {
-            if(scammer.getUUID().equals(uuid)) return scammer;
+            if(scammer.getUUID() != null && scammer.getUUID().equals(uuid)) return scammer;
         }
         return null;
     }
 
     public Scammer getByName(String name) {
         for(Scammer scammer : this) {
-            if(scammer.getName().equals(name)) return scammer;
+            if(scammer.getName() != null && scammer.getName().equals(name)) return scammer;
         }
         return null;
     }
 
     public boolean removeByUUID(String uuid) {
-        return removeIf(scammer -> scammer.getUUID().equals(uuid));
+        return removeIf(scammer -> scammer.getUUID() != null && scammer.getUUID().equals(uuid));
     }
 
     public boolean removeByName(String name) {
-        return removeIf(scammer -> scammer.getName().equals(name));
+        return removeIf(scammer -> scammer.getName() != null && scammer.getName().equals(name));
     }
 
     private boolean download() {

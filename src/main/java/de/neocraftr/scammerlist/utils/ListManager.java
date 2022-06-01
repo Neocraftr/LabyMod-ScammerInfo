@@ -60,12 +60,12 @@ public class ListManager {
             sc.getUpdateQueue().addList(list);
             lists.add(list);
         }
-        if(!hasScammerRadarMM) {
+        /*if(!hasScammerRadarMM) {
             PlayerList list = new PlayerList("scammer-radar-mm", true, true, "[SCAMMER] Radar MM", "%scammer-radar-mm%", PlayerType.TRUSTED);
             list.load();
             sc.getUpdateQueue().addList(list);
             lists.add(list);
-        }
+        }*/
 
         saveListSettings();
     }
