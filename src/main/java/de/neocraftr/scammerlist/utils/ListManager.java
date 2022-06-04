@@ -45,8 +45,6 @@ public class ListManager {
                 if(playerList.getMeta().getId().equals("scammer-radar-sc")) hasScammerRadarSC = true;
                 if(playerList.getMeta().getId().equals("scammer-radar-mm")) hasScammerRadarMM = true;
 
-                // Temporarily disable Scammer Radar MMs
-                if(playerList.getMeta().getId().equals("scammer-radar-mm")) continue;
 
                 playerList.load();
                 lists.add(playerList);
@@ -60,12 +58,12 @@ public class ListManager {
             sc.getUpdateQueue().addList(list);
             lists.add(list);
         }
-        /*if(!hasScammerRadarMM) {
+        if(!hasScammerRadarMM) {
             PlayerList list = new PlayerList("scammer-radar-mm", true, true, "[SCAMMER] Radar MM", "%scammer-radar-mm%", PlayerType.TRUSTED);
             list.load();
             sc.getUpdateQueue().addList(list);
             lists.add(list);
-        }*/
+        }
 
         saveListSettings();
     }
