@@ -74,6 +74,17 @@ public class Scammer {
         return date;
     }
 
+    @Override
+    public String toString() {
+        return "Scammer{" +
+                "uuid='" + uuid + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", originalName='" + originalName + '\'' +
+                ", date=" + date +
+                '}';
+    }
+
     public static class ScammerDeserializer implements JsonDeserializer<Scammer> {
 
         @Override

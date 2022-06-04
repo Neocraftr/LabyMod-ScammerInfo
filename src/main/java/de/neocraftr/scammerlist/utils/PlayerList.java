@@ -85,6 +85,10 @@ public class PlayerList extends ArrayList<Scammer> {
     private void updateNames() {
         if(!meta.isEnabled()) return;
         for(Scammer scammer : this) {
+            if(scammer.getUUID() == null) {
+                System.out.println(ScammerList.CONSOLE_PREFIX+"UUID is null for "+scammer);
+                continue;
+            }
             String name = sc.getHelper().getNameFromUUID(scammer.getUUID());
             scammer.setName(name);
         }
